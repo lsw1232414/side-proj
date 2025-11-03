@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>온비드 캠코 공매물건 조회 서비스</title>
+    <style>
+        :root {
+            --primary: #1a73e8;
+            --border: #ddd;
+            --bg-gray: #f8f9fa;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: 'Noto Sans KR', sans-serif;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background: white;
+            border-bottom: 1px solid var(--border);
+            padding: 1rem;
+        }
+        .search-section {
+            background: var(--bg-gray);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border-radius: 8px;
+        }
+        .search-form {
+            display: grid;
+            gap: 1rem;
+            grid-template-columns: 1fr 1fr auto;
+        }
+        .input-group {
+            margin-bottom: 1rem;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        input, select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+        }
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        .btn-outline {
+            border: 1px solid var(--primary);
+            background: white;
+            color: var(--primary);
+        }
+        .tabs {
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .tab {
+            padding: 0.5rem 1rem;
+            border: none;
+            background: none;
+            cursor: pointer;
+        }
+        .tab.active {
+            border-bottom: 2px solid var(--primary);
+            color: var(--primary);
+        }
+        .bid-list {
+            display: grid;
+            gap: 1rem;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        }
+        .bid-card {
+            border: 1px solid var(--border);
+            padding: 1rem;
+            border-radius: 8px;
+            background: white;
+        }
+        .bid-detail {
+            display: none;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+        .bid-detail.active {
+            display: block;
+        }
+        .favorite-list {
+            display: none;
+        }
+        .favorite-list.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1>온비드 캠코 공매물건 조회 서비스</h1>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- 검색 섹션 -->
+        <section class="search-section">
+            <form class="search-form" onsubmit="handleSearch(event)">
+                <div class="input-group">
+                    <label>지역</label>
+                    <select id="region">
+                        <option value="">전체</option>
+                        <option value="seoul">서울</option>
+                        <option value="gyeonggi">경기</option>
+                        <option value="incheon">인천</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>물건종류</label>
+                    <select id="propertyType">
+                        <option value="">전체</option>
+                        <option value="apartment">아파트</option>
+                        <option value="house">단독주택</option>
+                        <option value="land">토지</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">검색</button>
+            </form>
+        </section>
+
+        <!-- 탭 메뉴 -->
+        <div class="tabs">
+            <button class="tab active" onclick="showTab(event, 'bidList')">입찰 목록</button>
+            <button class="tab" onclick="showTab(event, 'favorites')">관심 입찰</button>
+        </div>
+
+        <!-- 입찰 목록 -->
+        <section id="bidList" class="bid-list">
+            <!-- 입찰 카드 예시 -->
+            <div class="bid-card">
+                <h3>서울 강남구 아파트</h3>
+                <p>감정가: 5억원</p>
+                <p>입찰기간: 2025.11.10 ~ 2025.11.17</p>
+                <button class="btn btn-outline" onclick="showBidDetail('bid1')">상세보기</button>
+                <button class="btn btn-outline" onclick="toggleFavorite(this, 'bid1')">관심등록</button>
+            </div>
+            <div class="bid-card">
+                <h3>경기도 분당구 상가</h3>
+                <p>감정가: 3억원</p>
+                <p>입찰기간: 2025.11.15 ~ 2025.11.22</p>
+                <button class="btn btn-outline" onclick="showBidDetail('bid2')">상세보기</button>
+                <button class="btn btn-outline" onclick="toggleFavorite(this, 'bid2')">관심등록</button>
+            </div>
+        </section>
+
+        <!-- 관심 입찰 목록 -->
+        <section id="favorites" class="favorite-list">
+            <h2>관심 등록된 입찰</h2>
+            <div class="bid-list">
+                <!-- 관심 입찰 항목들이 여기에 동적으로 추가됨 -->
+            </div>
+        </section>
+
+        <!-- 입찰 상세 정보 -->
+        <section id="bidDetail" class="bid-detail">
+            <h2>입찰 상세 정보</h2>
+            <div class="detail-content">
+                <p><strong>물건번호:</strong> <span id="bidNo">2023-001</span></p>
+                <p><strong>소재지:</strong> <span id="location">서울특별시 강남구 삼성동</span></p>
+                <p><strong>감정가:</strong> <span id="appraisedPrice">500,000,000원</span></p>
+                <p><strong>최저입찰가:</strong> <span id="startingPrice">400,000,000원</span></p>
+                <p><strong>입찰기간:</strong> <span id="bidPeriod">2025.11.10 ~ 2025.11.17</span></p>
+                <p><strong>입찰방식:</strong> <span id="bidMethod">전자입찰</span></p>
+                <div class="actions">
+                    <button class="btn btn-primary" onclick="redirectToPurchase()">구매시스템 연동</button>
+                    <button class="btn btn-outline" onclick="closeBidDetail()">닫기</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        function showTab(event, tabName) {
+            // 모든 탭 콘텐츠 숨기기
+            document.querySelectorAll('.bid-list, .favorite-list').forEach(el => {
+                el.style.display = 'none';
+            });
+            // 선택된 탭 콘텐츠 보이기
+            document.getElementById(tabName).style.display = 'block';
+            
+            // 탭 스타일 변경
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        function showBidDetail(bidId) {
+            document.getElementById('bidDetail').classList.add('active');
+            // API로부터 상세 정보를 가져와서 표시하는 로직이 들어갈 자리
+        }
+
+        function closeBidDetail() {
+            document.getElementById('bidDetail').classList.remove('active');
+        }
+
+        function toggleFavorite(btn, bidId) {
+            // 관심 입찰 토글 로직
+            if (btn.textContent === '관심등록') {
+                btn.textContent = '관심해제';
+                btn.style.backgroundColor = getComputedStyle(document.documentElement)
+                    .getPropertyValue('--primary').trim();
+                btn.style.color = 'white';
+            } else {
+                btn.textContent = '관심등록';
+                btn.style.backgroundColor = 'white';
+                btn.style.color = getComputedStyle(document.documentElement)
+                    .getPropertyValue('--primary').trim();
+            }
+        }
+
+        function redirectToPurchase() {
+            alert('구매시스템으로 연동합니다.');
+            // 실제 구매시스템 URL로 리다이렉트
+        }
+
+        // 검색 폼 제출 처리
+        function handleSearch(e) {
+            e.preventDefault();
+            const region = document.getElementById('region').value;
+            const propertyType = document.getElementById('propertyType').value;
+            // API 호출 및 결과 표시 로직이 들어갈 자리
+            alert(`검색 조건: 지역=${region}, 물건종류=${propertyType}`);
+        }
+    </script>
+</body>
+</html>
