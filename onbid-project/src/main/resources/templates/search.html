@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>검색결과</title>
+</head>
+<body>
+    <h2>검색결과</h2>
+    <div th:each="item : ${items}">
+        <p th:text="${item.cltrNm}">물건명</p>
+        <p th:text="${item.ldnmAdrs}">주소</p>
+        <a th:href="@{'/item/' + ${item.cltrNo}}">상세보기</a>
+        <button th:if="${loginUser != null}">관심등록</button>
+        <button th:if="${loginUser == null}" onclick="alert('로그인 필요')">관심등록</button>
+    </div>
+</body>
+</html>

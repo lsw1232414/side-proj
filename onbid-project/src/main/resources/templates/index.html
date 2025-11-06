@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>온비드 캠코 공매 조회서비스</title>
+</head>
+<body>
+    <h1>온비드 캠코 공매 조회서비스</h1>
+    <a href="/user/login">로그인</a>
+    <form action="/search" method="get">
+        <label>지역: <input type="text" name="sido"></label>
+        <label>물건종류: <input type="text" name="category"></label>
+        <button type="submit">검색</button>
+    </form>
+</body>
+</html>
