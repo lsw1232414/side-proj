@@ -1,15 +1,21 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="ko">
 <head>
-    <title>온비드 캠코 공매 조회서비스</title>
+    <meta charset="UTF-8">
+    <title>온비드 공매 조회</title>
 </head>
 <body>
-    <h1>온비드 캠코 공매 조회서비스</h1>
-    <a href="/user/login">로그인</a>
-    <form action="/search" method="get">
-        <label>지역: <input type="text" name="sido"></label>
-        <label>물건종류: <input type="text" name="category"></label>
-        <button type="submit">검색</button>
-    </form>
+    <h1>🏠 온비드 공매물건 조회 서비스</h1>
+    <p>서버가 정상적으로 실행 중입니다.</p>
+    <button onclick="test()">API 연결 테스트</button>
+
+    <script>
+        function test() {
+            fetch("/onbid/test")
+                .then(res => res.text())
+                .then(alert)
+                .catch(console.error);
+        }
+    </script>
 </body>
 </html>
