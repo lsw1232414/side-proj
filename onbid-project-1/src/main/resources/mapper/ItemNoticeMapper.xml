@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.lsw.onbid.mapper.ItemNoticeMapper">
+
+    <insert id="insertItemNotice">
+        INSERT INTO item_notice (notice_id, item_id, min_bid_price, start_date, end_date, status, disposal_type)
+        VALUES (#{noticeId}, #{itemId}, #{minBidPrice}, #{startDate}, #{endDate}, #{status}, #{disposalType})
+    </insert>
+
+    <select id="findByNoticeId" resultType="com.lsw.onbid.model.ItemNotice">
+        SELECT *
+        FROM item_notice
+        WHERE notice_id = #{noticeId}
+    </select>
+
+</mapper>

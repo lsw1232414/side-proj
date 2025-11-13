@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>온비드 공매 테스트</title>
+</head>
+<body>
+
+<h1>🏠 온비드 공매물건 테스트 화면</h1>
+
+<button onclick="refresh()">🔄 API 데이터 DB 저장</button>
+<button onclick="loadItems()">📥 DB에서 최근 4개 조회</button>
+
+<div id="result"></div>
+
+<script>
+    function refresh() {
+        fetch("/onbid/update", { method: "POST" })
+            .then(r => r.text())
+            .then(msg => alert(msg))
+            .catch(err => console.error(err));
+    }
+
+    function loadItems() {
+        fetch("/onbid/latest")
+            .then(r => r.json())
+            .then(list => {
+                let html = "<h3>📌 최근 4개 물건</h3>";
+                html += "<ul>";
+                list.forEach(i => {
+                    html += `<li>
+                        [${i.itemId}] ${i.cltrNm} (${i.category})<br>
+                        물건번호: ${i.cltrNo}<br>
+                        주소: ${i.address}<br>
+                        감정가: ${i.appraisalPrice}
+                    </li><hr>`;
+                });
+                html += "</ul>";
+                document.getElementById("result").innerHTML = html;
+            })
+            .catch(err => console.error(err));
+    }
+</script>
+
+</body>
+</html>

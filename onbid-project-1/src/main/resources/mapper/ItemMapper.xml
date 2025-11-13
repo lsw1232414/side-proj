@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.lsw.onbid.mapper.ItemMapper">
+
+    <!-- 신규 아이템 INSERT -->
+    <insert id="insertItem">
+        INSERT INTO item (cltr_no, cltr_nm, category, address, appraisal_price, updated_at)
+        VALUES (#{cltrNo}, #{cltrNm}, #{category}, #{address}, #{appraisalPrice}, #{updatedAt})
+    </insert>
+
+    <!-- 기존 아이템 UPDATE -->
+    <update id="updateItem">
+        UPDATE item
+        SET cltr_nm = #{cltrNm},
+            category = #{category},
+            address = #{address},
+            appraisal_price = #{appraisalPrice},
+            updated_at = #{updatedAt}
+        WHERE cltr_no = #{cltrNo}
+    </update>
+
+    <!-- 기존 존재 여부 확인 -->
+    <select id="findByCltrNo" resultType="com.lsw.onbid.model.Item">
+        SELECT *
+        FROM item
+        WHERE cltr_no = #{cltrNo}
+    </select>
+
+    <!-- 가장 마지막 업데이트 시간 -->
+    <select id="findLastUpdatedAt" resultType="string">
+        SELECT MAX(updated_at) FROM item
+    </select>
+
+    <!-- 최근 4개 조회 -->
+    <select id="findLatestItems" resultType="com.lsw.onbid.model.Item">
+        SELECT *
+        FROM item
+        ORDER BY item_id DESC
+            LIMIT 4
+    </select>
+
+</mapper>
