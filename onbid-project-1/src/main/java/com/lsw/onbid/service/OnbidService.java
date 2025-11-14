@@ -1,46 +1,55 @@
 package com.lsw.onbid.service;
 
-import java.util.List;
-
+import org.json.JSONArray;
 import org.springframework.stereotype.Service;
-
-import com.lsw.onbid.mapper.HistoryMapper;
 import com.lsw.onbid.mapper.ItemMapper;
-import com.lsw.onbid.model.History;
 import com.lsw.onbid.model.Item;
+import com.lsw.onbid.util.ExternalApiClient;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class OnbidService {
 
+    private final ExternalApiClient api;
     private final ItemMapper itemMapper;
-    private final HistoryMapper historyMapper;
 
-    /** 전체 물건 조회 */
-    public List<Item> findAll() {
-        return itemMapper.findAll();
-    }
-
-    /** 검색 */
-    public List<Item> search(String keyword, String cate1, Long minPrice, Long maxPrice) {
-        return itemMapper.search(keyword, cate1, minPrice, maxPrice);
-    }
-
-    /** 단건 조회 */
-    public Item findById(Long id) {
-        return itemMapper.findById(id);
-    }
-
-    /** 이력 조회 */
-    public List<History> findHistory(String cltrNo) {
-        return historyMapper.findByCltrNo(cltrNo);
-    }
-
-    /** (추후) API 연동해서 DB 갱신 – 지금은 더미 */
     public void syncFromApi() {
-        // TODO: 나중에 공공API 연결해서 item/history INSERT/UPDATE
-        System.out.println("🔵 [TODO] 공공 API 연동 후 DB 갱신 로직 구현 예정");
+
+        log.info("📌 API → DB 전체 동기화 시작");
+
+        int total = api.getTotalCount();
+        if (total == 0) {
+            log.warn("⚠ totalCount=0 → 중단");
+            return;
+        }
+
+        int pageSize = 100;
+        int totalPages = (int) Math.ceil(total / (double) pageSize);
+
+        for (int page = 1; page <= totalPages; page++) {
+
+            JSONArray arr = api.fetchItems(page, pageSize);
+
+            for (int i = 0; i < arr.length(); i++) {
+
+                Item item = Item.fromJson(arr.getJSONObject(i));
+                Item exist = itemMapper.findByCltrNo(item.getCltrNo());
+
+                if (exist == null) itemMapper.insert(item);
+                else itemMapper.update(item);
+            }
+
+            log.info("→ {} / {} 페이지 완료", page, totalPages);
+        }
+
+        log.info("🎉 모든 데이터 동기화 완료");
+    }
+
+    public java.util.List<Item> search(String keyword, String cate1, Long minPrice, Long maxPrice) {
+        return itemMapper.search(keyword, cate1, minPrice, maxPrice);
     }
 }

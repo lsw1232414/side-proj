@@ -1,136 +1,124 @@
 package com.lsw.onbid.util;
 
+import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.json.XML;
+import org.springframework.stereotype.Component;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.json.XML;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
 @Component
+@Slf4j
 public class ExternalApiClient {
 
     private static final String BASE_URL =
             "http://openapi.onbid.co.kr/openapi/services/KamcoPblsalThingInquireSvc/getKamcoPbctCltrList";
 
-    @Value("${onbid.serviceKey}")
     private String SERVICE_KEY;
 
-    /**
-     * 전체 개수 조회
-     */
+    @PostConstruct
+    public void loadKey() {
+        SERVICE_KEY = System.getenv("ONBID_API_KEY");
+
+        if (SERVICE_KEY == null || SERVICE_KEY.isEmpty()) {
+            log.error("❌ 환경변수 ONBID_API_KEY 없음");
+        } else {
+            log.info("🔑 ONBID API KEY 로딩 성공");
+        }
+    }
+
+    /** totalCount 조회 */
     public int getTotalCount() {
         try {
             String url = BASE_URL
-                    + "?serviceKey=" + SERVICE_KEY
+                    + "?ServiceKey=" + SERVICE_KEY   // ★ 대문자 ServiceKey 필수 ★
+                    + "&DPSL_MTD_CD=0001"
                     + "&pageNo=1"
-                    + "&numOfRows=1"
-                    + "&DPSL_MTD_CD=0001"; // 처분방식 코드
+                    + "&numOfRows=1";
 
-            log.info("[API] TOTAL COUNT URL: {}", url);
+            log.info("[API CALL] {}", url);
 
-            String xml = request(url);
-            JSONObject json = XML.toJSONObject(xml);
-
-            JSONObject body = json
-                    .getJSONObject("response")
-                    .getJSONObject("body");
-
+            JSONObject body = call(url);
             return body.optInt("totalCount", 0);
 
         } catch (Exception e) {
-            log.error("[API] getTotalCount() 실패", e);
+            log.error("[API totalCount ERROR]", e);
             return 0;
         }
     }
 
-    /**
-     * 목록 조회
-     */
-    public JSONArray fetchItems(int page, int pageSize) {
-
+    /** Page 조회 */
+    public JSONArray fetchItems(int page, int size) {
         try {
             String url = BASE_URL
-                    + "?ServiceKey=" + SERVICE_KEY
+                    + "?ServiceKey=" + SERVICE_KEY    // ★ 수정됨
+                    + "&DPSL_MTD_CD=0001"
                     + "&pageNo=" + page
-                    + "&numOfRows=" + pageSize
-                    + "&DPSL_MTD_CD=0001";
+                    + "&numOfRows=" + size;
 
-            log.info("[API] LIST URL: {}", url);
+            log.info("[API CALL] {}", url);
 
-            String xml = request(url);
-            JSONObject json = XML.toJSONObject(xml);
-
-            JSONObject body = json
-                    .getJSONObject("response")
-                    .getJSONObject("body");
+            JSONObject body = call(url);
 
             if (!body.has("items")) return new JSONArray();
 
             Object items = body.get("items");
+            if (items instanceof JSONObject obj) {
 
-            if (items instanceof JSONObject jo) {
-                if (jo.get("item") instanceof JSONArray ja) {
-                    return ja;
-                } else {
-                    JSONArray arr = new JSONArray();
-                    arr.put(jo.get("item"));
+                if (obj.get("item") instanceof JSONArray arr)
                     return arr;
-                }
+
+                JSONArray arr = new JSONArray();
+                arr.put(obj.get("item"));
+                return arr;
             }
 
             return new JSONArray();
 
         } catch (Exception e) {
-            log.error("[API] fetchItems() 실패", e);
+            log.error("[API fetchItems ERROR]", e);
             return new JSONArray();
         }
     }
 
-    /**
-     * 공통 HTTP 요청 처리
-     */
-    private String request(String apiUrl) throws Exception {
+    /** HTTP → XML → JSON 변환 */
+    private JSONObject call(String url) throws Exception {
+        String xml = request(url);
+        JSONObject json = XML.toJSONObject(xml);
 
+        if (!json.has("response")
+                || !json.getJSONObject("response").has("body")) {
+
+            log.error("[API ERROR] body 없음. XML={}", xml);
+            return new JSONObject();
+        }
+
+        return json.getJSONObject("response").getJSONObject("body");
+    }
+
+    private String request(String apiUrl) throws Exception {
         URL url = new URL(apiUrl);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-
         conn.setRequestMethod("GET");
-        
-        conn.setRequestProperty("User-Agent", "Mozilla/5.0");
-        conn.setRequestProperty("Accept", "*/*");
-        
-        conn.setConnectTimeout(7000);
-        conn.setReadTimeout(7000);
-
-        int responseCode = conn.getResponseCode();
-        log.info("[API] 응답 코드: {}", responseCode);
 
         BufferedReader br;
-
-        if (responseCode == 200) {
+        if (conn.getResponseCode() == 200)
             br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
-        } else {
+        else
             br = new BufferedReader(new InputStreamReader(conn.getErrorStream(), "UTF-8"));
-        }
 
-        StringBuilder result = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         String line;
-
-        while ((line = br.readLine()) != null) {
-            result.append(line);
-        }
+        while ((line = br.readLine()) != null)
+            sb.append(line);
 
         br.close();
         conn.disconnect();
-
-        return result.toString();
+        return sb.toString();
     }
 }

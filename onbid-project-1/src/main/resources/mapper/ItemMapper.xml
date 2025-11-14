@@ -1,88 +1,75 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper
-        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.lsw.onbid.mapper.ItemMapper">
 
-    <!-- 전체 조회 -->
-    <select id="findAll" resultType="com.lsw.onbid.model.Item">
-        SELECT
-            id,
-            cltr_mnmt_no  AS cltrMnmtNo,
-            cltr_no       AS cltrNo,
-            cltr_nm       AS cltrNm,
-            dpsl_mtd_cd   AS dpslMtdCd,
-            dpsl_mtd_nm   AS dpslMtdNm,
-            ctgr_hirk_id      AS ctgrHirkId,
-            ctgr_hirk_nm      AS ctgrHirkNm,
-            ctgr_hirk_id_mid  AS ctgrHirkIdMid,
-            ctgr_hirk_nm_mid  AS ctgrHirkNmMid,
-            sido,
-            dtl_addr      AS dtlAddr,
-            goods_price   AS goodsPrice
-        FROM item
-        ORDER BY id DESC
+    <select id="findByCltrNo" parameterType="string" resultType="com.lsw.onbid.model.Item">
+        SELECT * FROM item WHERE cltr_no = #{cltrNo}
     </select>
 
-    <!-- 단건 조회 -->
-    <select id="findById" parameterType="long" resultType="com.lsw.onbid.model.Item">
-        SELECT
-            id,
-            cltr_mnmt_no  AS cltrMnmtNo,
-            cltr_no       AS cltrNo,
-            cltr_nm       AS cltrNm,
-            dpsl_mtd_cd   AS dpslMtdCd,
-            dpsl_mtd_nm   AS dpslMtdNm,
-            ctgr_hirk_id      AS ctgrHirkId,
-            ctgr_hirk_nm      AS ctgrHirkNm,
-            ctgr_hirk_id_mid  AS ctgrHirkIdMid,
-            ctgr_hirk_nm_mid  AS ctgrHirkNmMid,
-            sido,
-            dtl_addr      AS dtlAddr,
-            goods_price   AS goodsPrice
-        FROM item
-        WHERE id = #{id}
-    </select>
-
-    <!-- 검색 -->
     <select id="search" resultType="com.lsw.onbid.model.Item">
-        SELECT
-            id,
-            cltr_mnmt_no  AS cltrMnmtNo,
-            cltr_no       AS cltrNo,
-            cltr_nm       AS cltrNm,
-            dpsl_mtd_cd   AS dpslMtdCd,
-            dpsl_mtd_nm   AS dpslMtdNm,
-            ctgr_hirk_id      AS ctgrHirkId,
-            ctgr_hirk_nm      AS ctgrHirkNm,
-            ctgr_hirk_id_mid  AS ctgrHirkIdMid,
-            ctgr_hirk_nm_mid  AS ctgrHirkNmMid,
-            sido,
-            dtl_addr      AS dtlAddr,
-            goods_price   AS goodsPrice
-        FROM item
+        SELECT * FROM item
         WHERE 1=1
-
         <if test="keyword != null and keyword != ''">
-            AND (sido LIKE CONCAT('%', #{keyword}, '%')
-             OR dtl_addr LIKE CONCAT('%', #{keyword}, '%')
-             OR cltr_nm LIKE CONCAT('%', #{keyword}, '%'))
+            AND cltr_nm LIKE CONCAT('%', #{keyword}, '%')
         </if>
-
         <if test="cate1 != null and cate1 != ''">
             AND ctgr_hirk_nm = #{cate1}
         </if>
-
         <if test="minPrice != null">
-            AND goods_price >= #{minPrice}
+            AND goods_price <![CDATA[ >= ]]> #{minPrice}
         </if>
-
         <if test="maxPrice != null">
-            AND goods_price &lt;= #{maxPrice}
+            AND goods_price <![CDATA[ <= ]]> #{maxPrice}
         </if>
-
         ORDER BY id DESC
     </select>
+
+    <insert id="insert" parameterType="com.lsw.onbid.model.Item">
+        INSERT INTO item (
+            cltr_mnmt_no,
+            cltr_no,
+            cltr_nm,
+            dpsl_mtd_cd,
+            dpsl_mtd_nm,
+            ctgr_hirk_id,
+            ctgr_hirk_nm,
+            ctgr_hirk_id_mid,
+            ctgr_hirk_nm_mid,
+            sido,
+            dtl_addr,
+            goods_price
+        ) VALUES (
+            #{cltrMnmtNo},
+            #{cltrNo},
+            #{cltrNm},
+            #{dpslMtdCd},
+            #{dpslMtdNm},
+            #{ctgrHirkId},
+            #{ctgrHirkNm},
+            #{ctgrHirkIdMid},
+            #{ctgrHirkNmMid},
+            #{sido},
+            #{dtlAddr},
+            #{goodsPrice}
+        )
+    </insert>
+
+    <update id="update" parameterType="com.lsw.onbid.model.Item">
+        UPDATE item SET
+            cltr_mnmt_no = #{cltrMnmtNo},
+            cltr_nm = #{cltrNm},
+            dpsl_mtd_cd = #{dpslMtdCd},
+            dpsl_mtd_nm = #{dpslMtdNm},
+            ctgr_hirk_id = #{ctgrHirkId},
+            ctgr_hirk_nm = #{ctgrHirkNm},
+            ctgr_hirk_id_mid = #{ctgrHirkIdMid},
+            ctgr_hirk_nm_mid = #{ctgrHirkNmMid},
+            sido = #{sido},
+            dtl_addr = #{dtlAddr},
+            goods_price = #{goodsPrice}
+        WHERE cltr_no = #{cltrNo}
+    </update>
 
 </mapper>
