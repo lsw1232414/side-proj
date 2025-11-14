@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.lsw.onbid.mapper.HistoryMapper">
+
+    <select id="findByCltrNo" parameterType="string"
+            resultType="com.lsw.onbid.model.History">
+        SELECT
+            id,
+            cltr_hstr_no AS cltrHstrNo,
+            cltr_no      AS cltrNo,
+            pbct_begn_dtm AS pbctBegnDtm,
+            pbct_cls_dtm  AS pbctClsDtm,
+            open_price    AS openPrice,
+            cltr_stts_nm  AS cltrSttsNm
+        FROM history
+        WHERE cltr_no = #{cltrNo}
+        ORDER BY id DESC
+    </select>
+
+</mapper>

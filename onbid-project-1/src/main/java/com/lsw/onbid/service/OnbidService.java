@@ -1,67 +1,46 @@
 package com.lsw.onbid.service;
 
-import com.lsw.onbid.mapper.ItemMapper;
-import com.lsw.onbid.model.Item;
-import com.lsw.onbid.util.ExternalApiClient;
-import lombok.RequiredArgsConstructor;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.springframework.stereotype.Service;
 import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import com.lsw.onbid.mapper.HistoryMapper;
+import com.lsw.onbid.mapper.ItemMapper;
+import com.lsw.onbid.model.History;
+import com.lsw.onbid.model.Item;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class OnbidService {
 
-    private final ExternalApiClient api;
     private final ItemMapper itemMapper;
+    private final HistoryMapper historyMapper;
 
-    /**
-     * 전체 데이터 동기화 (최초 8만건 + 이후 변경건만)
-     */
-    public void syncAll() {
-
-        int totalCount = api.getTotalCount();
-        int rows = 100;
-        int totalPages = (int) Math.ceil(totalCount / (double) rows);
-
-        for (int page = 1; page <= totalPages; page++) {
-
-            JSONArray items = api.fetchPage(page, rows);
-
-            for (Object obj : items) {
-                JSONObject json = (JSONObject) obj;
-
-                Item item = jsonToItem(json);
-
-                Item exist = itemMapper.findByCltrNo(item.getCltrNo());
-
-                if (exist == null) {
-                    itemMapper.insertItem(item);
-                } else {
-                    // 변경 여부 비교 후 다르면 update
-                    itemMapper.updateItem(item);
-                }
-            }
-        }
-
-        System.out.println("🔵 전체 동기화 완료: 총 " + totalCount + " 건");
+    /** 전체 물건 조회 */
+    public List<Item> findAll() {
+        return itemMapper.findAll();
     }
 
-    private Item jsonToItem(JSONObject json) {
-
-        Item item = new Item();
-
-        item.setCltrNo(json.optString("CLTR_NO"));
-        item.setCltrNm(json.optString("CLTR_NM"));
-        item.setCategory(json.optString("CTGR_FULL_NM"));
-        item.setAddress(json.optString("NMRD_ADRS"));
-        item.setAppraisalPrice(json.optLong("APSL_ASES_AVG_AMT"));
-
-        return item;
+    /** 검색 */
+    public List<Item> search(String keyword, String cate1, Long minPrice, Long maxPrice) {
+        return itemMapper.search(keyword, cate1, minPrice, maxPrice);
     }
 
-    public List<Item> getLatestItems() {
-        return itemMapper.findLatestItems();
+    /** 단건 조회 */
+    public Item findById(Long id) {
+        return itemMapper.findById(id);
+    }
+
+    /** 이력 조회 */
+    public List<History> findHistory(String cltrNo) {
+        return historyMapper.findByCltrNo(cltrNo);
+    }
+
+    /** (추후) API 연동해서 DB 갱신 – 지금은 더미 */
+    public void syncFromApi() {
+        // TODO: 나중에 공공API 연결해서 item/history INSERT/UPDATE
+        System.out.println("🔵 [TODO] 공공 API 연동 후 DB 갱신 로직 구현 예정");
     }
 }

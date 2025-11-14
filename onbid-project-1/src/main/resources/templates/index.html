@@ -2,45 +2,42 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>온비드 공매 테스트</title>
+    <title>온비드 공매 프로젝트 홈</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 40px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 18px;
+            border-radius: 4px;
+            border: 1px solid #2F5FD0;
+            color: #fff;
+            background-color: #2F5FD0;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .btn-outline {
+            background-color: #fff;
+            color: #2F5FD0;
+            margin-left: 8px;
+        }
+        h1 {
+            margin-bottom: 16px;
+        }
+    </style>
 </head>
 <body>
 
-<h1>🏠 온비드 공매물건 테스트 화면</h1>
+<h1>🏠 온비드 공매 프로젝트</h1>
 
-<button onclick="refresh()">🔄 API 데이터 DB 저장</button>
-<button onclick="loadItems()">📥 DB에서 최근 4개 조회</button>
+<p>네이버 부동산 스타일로 만든 공매 물건 조회 페이지로 이동할 수 있습니다.</p>
 
-<div id="result"></div>
-
-<script>
-    function refresh() {
-        fetch("/onbid/update", { method: "POST" })
-            .then(r => r.text())
-            .then(msg => alert(msg))
-            .catch(err => console.error(err));
-    }
-
-    function loadItems() {
-        fetch("/onbid/latest")
-            .then(r => r.json())
-            .then(list => {
-                let html = "<h3>📌 최근 4개 물건</h3>";
-                html += "<ul>";
-                list.forEach(i => {
-                    html += `<li>
-                        [${i.itemId}] ${i.cltrNm} (${i.category})<br>
-                        물건번호: ${i.cltrNo}<br>
-                        주소: ${i.address}<br>
-                        감정가: ${i.appraisalPrice}
-                    </li><hr>`;
-                });
-                html += "</ul>";
-                document.getElementById("result").innerHTML = html;
-            })
-            .catch(err => console.error(err));
-    }
-</script>
+<p>
+    <a href="/onbid/list" class="btn">공매 물건 페이지로 이동</a>
+    <a href="/swagger-ui.html" class="btn btn-outline">Swagger(API 문서) 보기</a>
+</p>
 
 </body>
 </html>
