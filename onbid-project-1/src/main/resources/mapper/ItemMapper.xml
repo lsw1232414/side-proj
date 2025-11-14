@@ -4,8 +4,13 @@
 
 <mapper namespace="com.lsw.onbid.mapper.ItemMapper">
 
-    <select id="findByCltrNo" parameterType="string" resultType="com.lsw.onbid.model.Item">
-        SELECT * FROM item WHERE cltr_no = #{cltrNo}
+    <!-- PK 조회: cltr_no + cltr_mnmt_no -->
+    <select id="findByPk" resultType="com.lsw.onbid.model.Item">
+        SELECT *
+        FROM item
+        WHERE cltr_no = #{cltrNo}
+          AND cltr_mnmt_no = #{cltrMnmtNo}
+        LIMIT 1
     </select>
 
     <select id="search" resultType="com.lsw.onbid.model.Item">
@@ -58,7 +63,6 @@
 
     <update id="update" parameterType="com.lsw.onbid.model.Item">
         UPDATE item SET
-            cltr_mnmt_no = #{cltrMnmtNo},
             cltr_nm = #{cltrNm},
             dpsl_mtd_cd = #{dpslMtdCd},
             dpsl_mtd_nm = #{dpslMtdNm},
@@ -70,6 +74,7 @@
             dtl_addr = #{dtlAddr},
             goods_price = #{goodsPrice}
         WHERE cltr_no = #{cltrNo}
+          AND cltr_mnmt_no = #{cltrMnmtNo}
     </update>
 
 </mapper>

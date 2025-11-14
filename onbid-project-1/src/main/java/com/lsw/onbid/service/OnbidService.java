@@ -2,6 +2,7 @@ package com.lsw.onbid.service;
 
 import org.json.JSONArray;
 import org.springframework.stereotype.Service;
+
 import com.lsw.onbid.mapper.ItemMapper;
 import com.lsw.onbid.model.Item;
 import com.lsw.onbid.util.ExternalApiClient;
@@ -37,10 +38,15 @@ public class OnbidService {
             for (int i = 0; i < arr.length(); i++) {
 
                 Item item = Item.fromJson(arr.getJSONObject(i));
-                Item exist = itemMapper.findByCltrNo(item.getCltrNo());
 
-                if (exist == null) itemMapper.insert(item);
-                else itemMapper.update(item);
+                // ★ 핵심: 공매번호 + 물건관리번호로 조회
+                Item exist = itemMapper.findByPk(item.getCltrNo(), item.getCltrMnmtNo());
+
+                if (exist == null) {
+                    itemMapper.insert(item);
+                } else {
+                    itemMapper.update(item);
+                }
             }
 
             log.info("→ {} / {} 페이지 완료", page, totalPages);
