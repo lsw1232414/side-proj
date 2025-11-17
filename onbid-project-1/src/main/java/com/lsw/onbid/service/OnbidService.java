@@ -3,9 +3,12 @@ package com.lsw.onbid.service;
 import java.util.List;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
+import com.lsw.onbid.mapper.HistoryMapper;
 import com.lsw.onbid.mapper.ItemMapper;
+import com.lsw.onbid.model.History;
 import com.lsw.onbid.model.Item;
 import com.lsw.onbid.util.ExternalApiClient;
 
@@ -19,13 +22,16 @@ public class OnbidService {
 
     private final ExternalApiClient api;
     private final ItemMapper itemMapper;
+    private final HistoryMapper historyMapper;
 
     public void syncFromApi() {
 
-        log.info("📌 전체 초기화 모드: item 테이블 비움");
-        itemMapper.truncate();  // ★★★ 테이블 싹 초기화
+        log.info("📌 전체 초기화 시작: item + history 테이블 비움");
 
-        int savedCount = 0;
+        itemMapper.truncate();
+        historyMapper.truncate();
+
+        int saved = 0;
 
         int total = api.getTotalCount();
         if (total == 0) {
@@ -42,32 +48,37 @@ public class OnbidService {
 
             for (int i = 0; i < arr.length(); i++) {
 
-                if (savedCount >= 1000) {
-                    log.info("⛔ 1000개 저장 완료 → Sync 강제 종료");
-                    return;
-                }
+                JSONObject jo = arr.getJSONObject(i);
 
-                Item item = Item.fromJson(arr.getJSONObject(i));
+                // ======== ITEM 저장 ========
+                Item item = Item.fromJson(jo);
 
-                // ⭐ API 결과 중복 방지
                 Item exist = itemMapper.findByPk(item.getCltrNo(), item.getCltrMnmtNo());
                 if (exist == null) {
                     itemMapper.insert(item);
-                    savedCount++;
+                }
+
+                // ======== HISTORY 저장 ========
+                History h = History.fromJson(jo);
+
+                // 저장
+                historyMapper.insert(h);
+
+                saved++;
+
+                if (saved >= 1000) {
+                    log.info("⛔ 1000건 수집 완료 → 강제 종료");
+                    return;
                 }
             }
 
-            log.info("→ {} / {} 페이지 완료", page, totalPages);
+            log.info("📄 {} / {} 페이지 완료", page, totalPages);
         }
 
-
-        log.info("🎉 전체 초기화 + 전체 재수집 완료 (총 {}건)", savedCount);
+        log.info("🎉 전체 Sync 완료 — 총 {}건 저장됨", saved);
     }
-
 
     public List<Item> search(String keyword, Long minPrice, Long maxPrice) {
         return itemMapper.searchNoCate(keyword, minPrice, maxPrice);
     }
-
-
 }

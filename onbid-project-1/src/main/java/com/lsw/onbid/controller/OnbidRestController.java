@@ -14,16 +14,16 @@ import com.lsw.onbid.service.OnbidService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/onbid/api")
+@RequiredArgsConstructor
 public class OnbidRestController {
 
-    private final OnbidService service;
+    private final OnbidService onbidService;
 
     @PostMapping("/sync")
     public String sync() {
-        service.syncFromApi();
-        return "ok";
+        onbidService.syncFromApi();
+        return "동기화 완료!";
     }
 
     @GetMapping("/search")
@@ -32,6 +32,6 @@ public class OnbidRestController {
             @RequestParam(required = false) Long minPrice,
             @RequestParam(required = false) Long maxPrice
     ) {
-        return service.search(keyword, minPrice, maxPrice);
+        return onbidService.search(keyword, minPrice, maxPrice);
     }
 }

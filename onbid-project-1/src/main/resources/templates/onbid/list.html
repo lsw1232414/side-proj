@@ -382,7 +382,7 @@
     <div class="header-inner">
         <div class="header-title">온비드 공매 – 부동산 검색</div>
         <nav class="header-right">
-            <a href="/">시작 화면</a>
+            <a href="/">홈</a>
             <a href="/cart">관심목록</a>
             <a href="/bid/list">입찰 기록</a>
             <a href="/swagger-ui.html">API 문서</a>
@@ -447,6 +447,21 @@
         return fetch("/onbid/api/search" + params)
             .then(r => r.json());
     }
+	function syncData() {
+	    if (!confirm("정말 API → DB 전체 동기화를 실행할까요?\n시간이 오래 걸릴 예정입니다.")) return;
+
+	    fetch("/onbid/api/sync", {
+	        method: "POST"
+	    })
+	    .then(res => res.text())
+	    .then(msg => {
+	        alert(msg || "동기화 완료!");
+	        search();  // 동기화 후 목록 새로고침
+	    })
+	    .catch(err => {
+	        alert("동기화 중 오류 발생\n" + err);
+	    });
+	}
 
     function search() {
         const keyword = document.getElementById("keyword").value.trim();

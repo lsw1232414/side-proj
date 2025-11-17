@@ -5,8 +5,8 @@
 <mapper namespace="com.lsw.onbid.mapper.ItemMapper">
 
     <update id="truncate">
-        TRUNCATE TABLE item
-    </update>
+    DELETE FROM item;
+</update>
 
     <!-- PK 조회 -->
     <select id="findByPk" resultType="com.lsw.onbid.model.Item">

@@ -197,7 +197,6 @@ function openBidForm(id) {
                 onclick="openBidForm(this.dataset.id)">입찰하기</button>
     </div>
 
-
     <!-- 제목 -->
     <h1 th:text="${item.cltrNm}"></h1>
 
@@ -215,12 +214,48 @@ function openBidForm(id) {
     <!-- 입찰 정보 -->
     <div class="section-title">입찰 정보</div>
     <table class="table-box">
-        <tr><th>입찰 시작</th><td th:text="${history != null ? history.pbctBegnDtm : '-'}"></td></tr>
-        <tr><th>입찰 마감</th><td th:text="${history != null ? history.pbctClsDtm : '-'}"></td></tr>
-        <tr><th>최저 입찰가</th><td th:text="${history != null ? history.openPrice : '-'}"></td></tr>
-        <tr><th>물건 상태</th><td th:text="${history != null ? history.cltrSttsNm : '-'}"></td></tr>
-        <tr><th>유찰 횟수</th><td th:text="${history != null ? history.uscbCnt : '-'}"></td></tr>
-        <tr><th>조회수</th><td th:text="${history != null ? history.iqryCnt : '-'}"></td></tr>
+
+        <tr>
+            <th>입찰 시작</th>
+            <td th:text="${
+                history != null ?
+                history.pbctBegnDtm.substring(0,4) + '년 ' +
+                history.pbctBegnDtm.substring(4,6) + '월 ' +
+                history.pbctBegnDtm.substring(6,8) + '일 ' +
+                history.pbctBegnDtm.substring(8,10) + '시 ' +
+                history.pbctBegnDtm.substring(10,12) + '분'
+                : '-'
+            }"></td>
+        </tr>
+
+        <tr>
+            <th>입찰 마감</th>
+            <td th:text="${
+                history != null ?
+                history.pbctClsDtm.substring(0,4) + '년 ' +
+                history.pbctClsDtm.substring(4,6) + '월 ' +
+                history.pbctClsDtm.substring(6,8) + '일 ' +
+                history.pbctClsDtm.substring(8,10) + '시 ' +
+                history.pbctClsDtm.substring(10,12) + '분'
+                : '-'
+            }"></td>
+        </tr>
+
+        <tr>
+            <th>최저 입찰가</th>
+            <td th:text="${history != null ? #numbers.formatInteger(history.openPrice, 3, 'COMMA') + '원' : '-'}"></td>
+        </tr>
+
+        <tr>
+            <th>유찰 횟수</th>
+            <td th:text="${history != null ? history.uscbidCnt : '-'}"></td>
+        </tr>
+
+        <tr>
+            <th>조회수</th>
+            <td th:text="${history != null ? history.iqryCnt : '-'}"></td>
+        </tr>
+
     </table>
 
     <button class="btn-back" onclick="history.back()">← 뒤로가기</button>

@@ -11,5 +11,11 @@ import com.lsw.onbid.model.History;
 public interface HistoryMapper {
 
     List<History> findByCltrNo(@Param("cltrNo") String cltrNo);
+
     History findLatestByCltrNo(@Param("cltrNo") String cltrNo);
+
+    // ★★★★★ 추가해야 하는 메서드 2개 ★★★★★
+    void insert(History history);
+
+    void truncate();
 }

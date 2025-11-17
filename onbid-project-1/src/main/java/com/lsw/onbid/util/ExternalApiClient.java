@@ -16,8 +16,11 @@ import java.net.URL;
 @Slf4j
 public class ExternalApiClient {
 
-    private static final String BASE_URL =
+    private static final String BASE_LIST_URL =
             "http://openapi.onbid.co.kr/openapi/services/KamcoPblsalThingInquireSvc/getKamcoPbctCltrList";
+
+    private static final String BASE_DETAIL_URL =
+            "http://openapi.onbid.co.kr/openapi/services/KamcoPblsalThingInquireSvc/getKamcoPbctCltrThng";
 
     private String SERVICE_KEY;
 
@@ -35,8 +38,8 @@ public class ExternalApiClient {
     /** totalCount 조회 */
     public int getTotalCount() {
         try {
-            String url = BASE_URL
-                    + "?ServiceKey=" + SERVICE_KEY   // ★ 대문자 ServiceKey 필수 ★
+            String url = BASE_LIST_URL
+                    + "?ServiceKey=" + SERVICE_KEY
                     + "&pageNo=1"
                     + "&numOfRows=1";
 
@@ -54,8 +57,8 @@ public class ExternalApiClient {
     /** Page 조회 */
     public JSONArray fetchItems(int page, int size) {
         try {
-            String url = BASE_URL
-                    + "?ServiceKey=" + SERVICE_KEY    // ★ 수정됨
+            String url = BASE_LIST_URL
+                    + "?ServiceKey=" + SERVICE_KEY
                     + "&DPSL_MTD_CD=0001"
                     + "&pageNo=" + page
                     + "&numOfRows=" + size;
@@ -82,6 +85,29 @@ public class ExternalApiClient {
         } catch (Exception e) {
             log.error("[API fetchItems ERROR]", e);
             return new JSONArray();
+        }
+    }
+
+    /** 🟨 물건 상세 조회 (history용 데이터) */
+    public JSONObject fetchDetail(String cltrNo) {
+        try {
+            String url = BASE_DETAIL_URL
+                    + "?ServiceKey=" + SERVICE_KEY
+                    + "&CLTR_NO=" + cltrNo;
+
+            log.info("[API DETAIL CALL] {}", url);
+
+            JSONObject body = call(url);
+
+            if (!body.has("items")) return null;
+
+            JSONObject items = body.getJSONObject("items");
+
+            return items.optJSONObject("item");
+
+        } catch (Exception e) {
+            log.error("[API DETAIL ERROR]", e);
+            return null;
         }
     }
 

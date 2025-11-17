@@ -5,27 +5,37 @@
 
 <mapper namespace="com.lsw.onbid.mapper.HistoryMapper">
 
-    <select id="findByCltrNo" parameterType="string"
-            resultType="com.lsw.onbid.model.History">
-        SELECT
-            id,
-            cltr_hstr_no AS cltrHstrNo,
-            cltr_no      AS cltrNo,
-            pbct_begn_dtm AS pbctBegnDtm,
-            pbct_cls_dtm  AS pbctClsDtm,
-            open_price    AS openPrice,
-            cltr_stts_nm  AS cltrSttsNm
+    <!-- 테이블 비우기 -->
+    <update id="truncate">
+    DELETE FROM history;
+</update>
+
+
+    <!-- 저장 -->
+    <insert id="insert" parameterType="com.lsw.onbid.model.History">
+        INSERT INTO history
+        (cltr_no, pbct_begn_dtm, pbct_cls_dtm,
+         open_price, uscbid_cnt, iqry_cnt)
+        VALUES
+        (#{cltrNo}, #{pbctBegnDtm}, #{pbctClsDtm},
+         #{openPrice}, #{uscbidCnt}, #{iqryCnt})
+    </insert>
+
+    <!-- 특정 물건의 이력 전체 -->
+    <select id="findByCltrNo" resultType="com.lsw.onbid.model.History">
+        SELECT *
         FROM history
         WHERE cltr_no = #{cltrNo}
         ORDER BY id DESC
     </select>
-    <select id="findLatestByCltrNo" resultType="com.lsw.onbid.model.History">
-    SELECT *
-    FROM history
-    WHERE cltr_no = #{cltrNo}
-    ORDER BY id DESC
-    LIMIT 1
-	</select>
 
+    <!-- 최신 이력 1개 -->
+    <select id="findLatestByCltrNo" resultType="com.lsw.onbid.model.History">
+        SELECT *
+        FROM history
+        WHERE cltr_no = #{cltrNo}
+        ORDER BY id DESC
+        LIMIT 1
+    </select>
 
 </mapper>
