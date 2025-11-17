@@ -29,14 +29,23 @@ public class Item {
         item.setCltrNm(jo.optString("CLTR_NM"));
         item.setDpslMtdCd(jo.optString("DPSL_MTD_CD"));
         item.setDpslMtdNm(jo.optString("DPSL_MTD_NM"));
-        item.setCtgrHirkId(jo.optString("CTGR_HIRK_ID"));
-        item.setCtgrHirkNm(jo.optString("CTGR_HIRK_NM"));
-        item.setCtgrHirkIdMid(jo.optString("CTGR_HIRK_ID_MID"));
-        item.setCtgrHirkNmMid(jo.optString("CTGR_HIRK_NM_MID"));
-        item.setSido(jo.optString("SIDO_NM"));
+
+        // 카테고리는 이것만 존재
+        item.setCtgrHirkNm(jo.optString("CTGR_FULL_NM"));
+
+        // 나머지 카테고리 필드는 API에 없음 → 빈 문자열 처리
+        item.setCtgrHirkId("");
+        item.setCtgrHirkIdMid("");
+        item.setCtgrHirkNmMid("");
+
+        item.setSido(jo.optString("SIDO"));
         item.setDtlAddr(jo.optString("LDNM_ADRS"));
-        item.setGoodsPrice(jo.optLong("APSL_ASES_AVG_AMT"));
+
+        // 감정가
+        item.setGoodsPrice(jo.optLong("APSL_ASES_AVG_AMT", 0));
 
         return item;
     }
+
+
 }

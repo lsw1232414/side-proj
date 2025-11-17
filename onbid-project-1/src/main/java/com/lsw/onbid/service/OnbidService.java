@@ -1,5 +1,7 @@
 package com.lsw.onbid.service;
 
+import java.util.List;
+
 import org.json.JSONArray;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +22,10 @@ public class OnbidService {
 
     public void syncFromApi() {
 
-        log.info("📌 API → DB 전체 동기화 시작");
+        log.info("📌 전체 초기화 모드: item 테이블 비움");
+        itemMapper.truncate();  // ★★★ 테이블 싹 초기화
+
+        int savedCount = 0;
 
         int total = api.getTotalCount();
         if (total == 0) {
@@ -37,25 +42,32 @@ public class OnbidService {
 
             for (int i = 0; i < arr.length(); i++) {
 
+                if (savedCount >= 1000) {
+                    log.info("⛔ 1000개 저장 완료 → Sync 강제 종료");
+                    return;
+                }
+
                 Item item = Item.fromJson(arr.getJSONObject(i));
 
-                // ★ 핵심: 공매번호 + 물건관리번호로 조회
+                // ⭐ API 결과 중복 방지
                 Item exist = itemMapper.findByPk(item.getCltrNo(), item.getCltrMnmtNo());
-
                 if (exist == null) {
                     itemMapper.insert(item);
-                } else {
-                    itemMapper.update(item);
+                    savedCount++;
                 }
             }
 
             log.info("→ {} / {} 페이지 완료", page, totalPages);
         }
 
-        log.info("🎉 모든 데이터 동기화 완료");
+
+        log.info("🎉 전체 초기화 + 전체 재수집 완료 (총 {}건)", savedCount);
     }
 
-    public java.util.List<Item> search(String keyword, String cate1, Long minPrice, Long maxPrice) {
-        return itemMapper.search(keyword, cate1, minPrice, maxPrice);
+
+    public List<Item> search(String keyword, Long minPrice, Long maxPrice) {
+        return itemMapper.searchNoCate(keyword, minPrice, maxPrice);
     }
+
+
 }

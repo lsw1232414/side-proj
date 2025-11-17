@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.lsw.onbid.mapper.BidMapper">
+
+    <!-- ✅ 입찰 등록 -->
+    <insert id="insert" parameterType="com.lsw.onbid.dto.BidRequest">
+        INSERT INTO bid (item_id, username, phone, bid_price)
+        VALUES (#{itemId}, #{username}, #{phone}, #{bidPrice})
+    </insert>
+
+    <!-- ✅ 전체 조회 -->
+    <select id="findAll" resultType="com.lsw.onbid.dto.BidResponse">
+        SELECT 
+            b.id,
+            b.username,
+            b.phone,
+            b.bid_price   AS bidPrice,
+            b.created_at  AS createdAt,
+            i.cltr_nm     AS cltrNm
+        FROM bid b
+        JOIN item i ON b.item_id = i.id
+        ORDER BY b.id DESC
+    </select>
+
+    <!-- ✅ 선택 삭제 -->
+    <delete id="deleteSelected">
+        DELETE FROM bid
+        WHERE id IN
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <!-- ✅ 전체 삭제 -->
+    <delete id="clearAll">
+        DELETE FROM bid
+    </delete>
+
+</mapper>

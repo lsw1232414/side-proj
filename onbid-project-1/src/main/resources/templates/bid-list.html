@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>입찰 기록</title>
+    <style>
+        :root {
+            --primary: #2F5FD0;
+            --primary-dark: #254cad;
+            --gray-100: #f5f6f8;
+            --gray-200: #e6e8eb;
+            --gray-300: #d1d5db;
+            --gray-500: #6b7280;
+            --gray-700: #374151;
+            --danger: #e74c3c;
+        }
+
+        body {
+            margin: 0;
+            font-family: -apple-system, "맑은 고딕", sans-serif;
+            background: var(--gray-100);
+        }
+
+        /* 공통 헤더 */
+        .top-header {
+            background: var(--primary);
+            color: #fff;
+            padding: 14px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.12);
+            margin-bottom: 24px;
+        }
+        .header-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header-title {
+            font-size: 20px;
+            font-weight: 700;
+        }
+        .header-right a {
+            color: #fff;
+            margin-left: 16px;
+            text-decoration: none;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .header-right a:hover {
+            opacity: 1;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto 40px;
+            padding: 0 20px;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            padding: 20px 22px;
+        }
+
+        h2 {
+            margin-top: 0;
+            margin-bottom: 16px;
+            font-size: 20px;
+            border-left: 4px solid var(--primary);
+            padding-left: 10px;
+            color: var(--gray-700);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        thead th {
+            background: #f3f4ff;
+            border-bottom: 1px solid #dbe1f3;
+            padding: 10px;
+            text-align: left;
+        }
+        tbody td {
+            border-bottom: 1px solid #f1f1f1;
+            padding: 10px;
+        }
+
+        .bid-actions {
+            margin-top: 16px;
+            display: flex;
+            gap: 10px;
+        }
+        .btn {
+            padding: 8px 14px;
+            border-radius: 999px;
+            cursor: pointer;
+            border: none;
+            font-size: 13px;
+            transition: 0.15s;
+        }
+        .btn-danger { background: var(--danger); color: #fff; }
+        .btn-clear  { background: #555; color: #fff; }
+        .btn:hover { opacity: 0.9; }
+    </style>
+</head>
+<body>
+
+<!-- 공통 헤더 -->
+<header class="top-header">
+    <div class="header-inner">
+        <div class="header-title">입찰 기록</div>
+        <nav class="header-right">
+            <a href="/onbid/list">홈</a>
+            <a href="/cart">관심목록</a>
+            <a href="/bid/list">입찰 기록</a>
+        </nav>
+    </div>
+</header>
+
+<div class="container">
+    <div class="card">
+        <h2>입찰 내역</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th><input type="checkbox" onclick="toggleAll(this)"></th>
+                    <th>번호</th>
+                    <th>물건명</th>
+                    <th>입찰자</th>
+                    <th>입찰가</th>
+                    <th>연락처</th>
+                    <th>입찰일</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="b : ${bids}">
+                    <td><input type="checkbox" class="chk" th:value="${b.id}"></td>
+                    <td th:text="${b.id}"></td>
+                    <td th:text="${b.cltrNm}"></td>
+                    <td th:text="${b.username}"></td>
+                    <td th:text="${#numbers.formatInteger(b.bidPrice, 3, 'COMMA')} + ' 원'"></td>
+                    <td th:text="${b.phone}"></td>
+                    <td th:text="${b.createdAt}"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="bid-actions">
+            <button class="btn btn-danger" onclick="deleteSelectedBids()">선택 삭제</button>
+            <button class="btn btn-clear" onclick="clearBids()">전체 비우기</button>
+        </div>
+    </div>
+</div>
+
+<script>
+function getChecked() {
+    return [...document.querySelectorAll(".chk:checked")].map(c => Number(c.value));
+}
+
+function toggleAll(chk) {
+    document.querySelectorAll(".chk").forEach(c => c.checked = chk.checked);
+}
+
+function deleteSelectedBids() {
+    const ids = getChecked();
+    if (ids.length === 0) {
+        alert("삭제할 입찰 기록을 선택하세요.");
+        return;
+    }
+
+    if (!confirm("선택한 입찰 기록을 삭제하시겠습니까?")) return;
+
+    fetch("/bid/delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(ids)
+    })
+    .then(r => r.text())
+    .then(msg => {
+        alert(msg);
+        location.reload();
+    });
+}
+
+function clearBids() {
+    if (!confirm("정말 모든 입찰 기록을 삭제하시겠습니까?")) return;
+
+    fetch("/bid/clear", { method: "POST" })
+        .then(r => r.text())
+        .then(msg => {
+            alert(msg);
+            location.reload();
+        });
+}
+</script>
+
+</body>
+</html>

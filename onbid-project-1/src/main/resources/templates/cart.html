@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>관심목록</title>
+
+    <style>
+        :root {
+            --primary: #2F5FD0;
+            --primary-dark: #254cad;
+            --gray-100: #f5f6f8;
+            --gray-200: #e6e8eb;
+            --gray-300: #d1d5db;
+            --gray-500: #6b7280;
+            --gray-700: #374151;
+            --danger: #e74c3c;
+            --success: #2ecc71;
+        }
+
+        body {
+            margin: 0;
+            font-family: -apple-system, "맑은 고딕", sans-serif;
+            background: var(--gray-100);
+        }
+
+        /* 공통 헤더 */
+        .top-header {
+            background: var(--primary);
+            color: #fff;
+            padding: 14px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.12);
+            margin-bottom: 24px;
+        }
+        .header-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header-title {
+            font-size: 20px;
+            font-weight: 700;
+        }
+        .header-right a {
+            color: #fff;
+            margin-left: 16px;
+            text-decoration: none;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .header-right a:hover {
+            opacity: 1;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto 40px;
+            padding: 0 20px;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            padding: 20px 22px;
+        }
+
+        h2 {
+            margin-top: 0;
+            margin-bottom: 16px;
+            font-size: 20px;
+            border-left: 4px solid var(--primary);
+            padding-left: 10px;
+            color: var(--gray-700);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+        thead th {
+            background: #f3f4ff;
+            border-bottom: 1px solid #dbe1f3;
+            padding: 10px;
+            text-align: left;
+        }
+        tbody td {
+            border-bottom: 1px solid #f1f1f1;
+            padding: 10px;
+        }
+
+        .cart-actions {
+            margin-top: 16px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 9px 16px;
+            border-radius: 999px;
+            cursor: pointer;
+            border: none;
+            font-size: 13px;
+            transition: 0.15s;
+        }
+        .btn-danger { background: var(--danger); color: #fff; }
+        .btn-clear  { background: #555; color: #fff; }
+        .btn-buy    { background: var(--success); color: #fff; }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        /* ===== 모달 ===== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.4);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        .modal-box {
+            background: #fff;
+            width: 360px;
+            padding: 22px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+        }
+        .modal-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 16px;
+        }
+        .modal-row {
+            margin-bottom: 12px;
+        }
+        .modal-row label {
+            font-size: 13px;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .modal-row input {
+            width: 100%;
+            border: 1px solid var(--gray-300);
+            padding: 8px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .modal-actions {
+            text-align: right;
+            margin-top: 14px;
+        }
+        .btn-cancel {
+            background: var(--gray-300);
+            padding: 7px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            border: none;
+        }
+        .btn-submit {
+            background: var(--primary);
+            color: #fff;
+            padding: 7px 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            border: none;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<!-- 공통 헤더 -->
+<header class="top-header">
+    <div class="header-inner">
+        <div class="header-title">관심목록</div>
+        <nav class="header-right">
+            <a href="/onbid/list">홈</a>
+            <a href="/cart">관심목록</a>
+            <a href="/bid/list">입찰 기록</a>
+        </nav>
+    </div>
+</header>
+
+<div class="container">
+    <div class="card">
+
+        <h2>관심 물건 목록</h2>
+
+        <!-- 테이블 -->
+        <table>
+            <thead>
+                <tr>
+                    <th><input type="checkbox" onclick="toggleAll(this)"></th>
+                    <th>물건명</th>
+                    <th>주소</th>
+                    <th>감정가</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr th:each="c : ${list}">
+                    <td><input type="checkbox" class="chk" th:value="${c.id}"></td>
+                    <td th:text="${c.cltrNm}"></td>
+                    <td th:text="${c.sido + ' ' + c.dtlAddr}"></td>
+                    <td th:text="${#numbers.formatInteger(c.goodsPrice, 3, 'COMMA')} + '원'"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="cart-actions">
+            <button class="btn btn-danger" onclick="deleteSelected()">선택 삭제</button>
+            <button class="btn btn-clear" onclick="clearCart()">전체 비우기</button>
+            <button class="btn btn-buy" onclick="openBidFromCart()">선택 입찰</button>
+        </div>
+
+    </div>
+</div>
+
+<!-- JS -->
+<script>
+/* -----------------------------
+   공통 체크박스 함수
+----------------------------- */
+function getChecked() {
+    return [...document.querySelectorAll(".chk:checked")].map(c => Number(c.value));
+}
+
+function toggleAll(chk) {
+    document.querySelectorAll(".chk").forEach(c => c.checked = chk.checked);
+}
+
+/* -----------------------------
+   선택 삭제
+----------------------------- */
+function deleteSelected() {
+    const ids = getChecked();
+    if (ids.length === 0) return alert("삭제할 항목을 선택하세요.");
+
+    fetch("/cart/delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(ids)
+    })
+    .then(() => location.reload());
+}
+
+/* -----------------------------
+   전체 비우기
+----------------------------- */
+function clearCart() {
+    if (!confirm("장바구니 전체를 비우시겠습니까?")) return;
+
+    fetch("/cart/clear", { method:"POST" })
+        .then(() => location.reload());
+}
+
+/* -----------------------------
+   선택 입찰 (1개만 가능)
+----------------------------- */
+let selectedBidItemId = null;
+
+function openBidFromCart() {
+    const ids = getChecked();
+
+    if (ids.length === 0) {
+        alert("입찰할 항목을 선택하세요.");
+        return;
+    }
+    if (ids.length > 1) {
+        alert("입찰은 한 번에 하나만 가능합니다.");
+        return;
+    }
+
+    selectedBidItemId = ids[0];
+    document.getElementById("bidModal").style.display = "flex";
+}
+
+function closeBidModal() {
+    document.getElementById("bidModal").style.display = "none";
+}
+
+function submitBid() {
+    const price = document.getElementById("modalBidPrice").value.trim();
+    const name = document.getElementById("modalBidName").value.trim();
+    const phone = document.getElementById("modalBidPhone").value.trim();
+
+    if (!price || !name || !phone) {
+        alert("모든 값을 입력해주세요.");
+        return;
+    }
+
+    const body = {
+        itemId: selectedBidItemId,
+        bidPrice: price,
+        username: name,
+        phone: phone
+    };
+
+    fetch("/bid/submit", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(body)
+    })
+        .then(r => r.text())
+        .then(msg => {
+            alert("입찰 완료!");
+            closeBidModal();
+            location.reload();
+        })
+        .catch(e => alert("오류: " + e));
+}
+</script>
+
+<!-- ===== 모달 ===== -->
+<div id="bidModal" class="modal-overlay">
+    <div class="modal-box">
+
+        <div class="modal-title">입찰하기</div>
+
+        <div class="modal-row">
+            <label>입찰 금액</label>
+            <input type="number" id="modalBidPrice" placeholder="예: 25000000">
+        </div>
+
+        <div class="modal-row">
+            <label>입찰자 이름</label>
+            <input type="text" id="modalBidName" placeholder="예: 홍길동">
+        </div>
+
+        <div class="modal-row">
+            <label>연락처</label>
+            <input type="text" id="modalBidPhone" placeholder="예: 010-1234-5678">
+        </div>
+
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeBidModal()">취소</button>
+            <button class="btn-submit" onclick="submitBid()">입찰하기</button>
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>

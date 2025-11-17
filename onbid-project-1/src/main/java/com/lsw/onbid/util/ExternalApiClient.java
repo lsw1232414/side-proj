@@ -37,7 +37,6 @@ public class ExternalApiClient {
         try {
             String url = BASE_URL
                     + "?ServiceKey=" + SERVICE_KEY   // ★ 대문자 ServiceKey 필수 ★
-                    + "&DPSL_MTD_CD=0001"
                     + "&pageNo=1"
                     + "&numOfRows=1";
 

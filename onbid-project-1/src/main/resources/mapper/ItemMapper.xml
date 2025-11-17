@@ -4,7 +4,11 @@
 
 <mapper namespace="com.lsw.onbid.mapper.ItemMapper">
 
-    <!-- PK 조회: cltr_no + cltr_mnmt_no -->
+    <update id="truncate">
+        TRUNCATE TABLE item
+    </update>
+
+    <!-- PK 조회 -->
     <select id="findByPk" resultType="com.lsw.onbid.model.Item">
         SELECT *
         FROM item
@@ -13,24 +17,31 @@
         LIMIT 1
     </select>
 
-    <select id="search" resultType="com.lsw.onbid.model.Item">
-        SELECT * FROM item
-        WHERE 1=1
+    <!-- 🔥 검색 (카테고리 없음) -->
+    <select id="searchNoCate" resultType="com.lsw.onbid.model.Item">
+        SELECT *
+        FROM item
+        WHERE 1 = 1
+
         <if test="keyword != null and keyword != ''">
-            AND cltr_nm LIKE CONCAT('%', #{keyword}, '%')
+            AND (cltr_nm LIKE CONCAT('%', #{keyword}, '%')
+             OR  sido LIKE CONCAT('%', #{keyword}, '%')
+             OR  dtl_addr LIKE CONCAT('%', #{keyword}, '%'))
         </if>
-        <if test="cate1 != null and cate1 != ''">
-            AND ctgr_hirk_nm = #{cate1}
-        </if>
+
         <if test="minPrice != null">
-            AND goods_price <![CDATA[ >= ]]> #{minPrice}
+            AND goods_price &gt;= #{minPrice}
         </if>
+
         <if test="maxPrice != null">
-            AND goods_price <![CDATA[ <= ]]> #{maxPrice}
+            AND goods_price &lt;= #{maxPrice}
         </if>
+
+        <!-- 🔥 여기 중요: item_id → id -->
         ORDER BY id DESC
     </select>
 
+    <!-- 신규 저장 -->
     <insert id="insert" parameterType="com.lsw.onbid.model.Item">
         INSERT INTO item (
             cltr_mnmt_no,
@@ -61,6 +72,7 @@
         )
     </insert>
 
+    <!-- 업데이트 -->
     <update id="update" parameterType="com.lsw.onbid.model.Item">
         UPDATE item SET
             cltr_nm = #{cltrNm},

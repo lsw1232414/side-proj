@@ -4,151 +4,179 @@
     <meta charset="UTF-8">
     <title>온비드 공매물건 검색</title>
     <style>
+        :root {
+            --primary: #2F5FD0;
+            --primary-dark: #254cad;
+            --gray-100: #f5f6f8;
+            --gray-200: #e6e8eb;
+            --gray-300: #d1d5db;
+            --gray-500: #6b7280;
+            --gray-700: #374151;
+            --danger: #e74c3c;
+            --success: #2ecc71;
+        }
+
         body {
             margin: 0;
             font-family: -apple-system, BlinkMacSystemFont, "맑은 고딕", Arial, sans-serif;
-            background: #f5f6f8;
-        }
-        header {
-            background: #2F5FD0;
-            color: #fff;
-            padding: 16px 24px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        header .logo {
-            font-size: 20px;
-            font-weight: bold;
-        }
-        header .nav-right a {
-            color: #fff;
-            margin-left: 12px;
-            font-size: 13px;
-            text-decoration: none;
+            background: var(--gray-100);
         }
 
+        /* ---------------------- 공통 헤더 ---------------------- */
+        .top-header {
+            background: var(--primary);
+            color: #fff;
+            padding: 14px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.12);
+            margin-bottom: 24px;
+        }
+        .header-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header-title {
+            font-size: 20px;
+            font-weight: 700;
+        }
+        .header-right a {
+            color: #fff;
+            margin-left: 16px;
+            text-decoration: none;
+            font-size: 14px;
+            opacity: 0.9;
+            transition: 0.2s;
+        }
+        .header-right a:hover {
+            opacity: 1;
+            text-decoration: underline;
+        }
+
+        /* ---------------------- 공통 레이아웃 ---------------------- */
         .container {
             max-width: 1100px;
-            margin: 24px auto 40px;
+            margin: 0 auto 40px;
             padding: 0 16px;
         }
 
+        /* ---------------------- 검색 박스 ---------------------- */
         .search-box {
             background: #fff;
-            border-radius: 8px;
-            padding: 16px 18px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
-            margin-bottom: 18px;
+            border-radius: 12px;
+            padding: 18px 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            margin-bottom: 20px;
         }
-
         .search-row {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
+            gap: 10px;
             align-items: center;
         }
-
         .search-row label {
             font-size: 13px;
-            color: #555;
+            color: var(--gray-700);
             margin-right: 4px;
         }
-
         .search-row input[type="text"],
         .search-row input[type="number"],
         .search-row select {
-            border: 1px solid #d1d5db;
-            border-radius: 4px;
-            padding: 6px 8px;
+            border: 1px solid var(--gray-300);
+            border-radius: 8px;
+            padding: 7px 10px;
             font-size: 13px;
         }
-
         .search-row input[type="number"] {
-            width: 120px;
+            width: 130px;
         }
-
         .search-row .keyword-input {
             flex: 1;
-            min-width: 220px;
+            min-width: 240px;
         }
 
         .btn-primary {
-            background: #2F5FD0;
-            border: 1px solid #2F5FD0;
+            background: var(--primary);
+            border: none;
             color: #fff;
-            padding: 8px 14px;
-            border-radius: 4px;
+            padding: 9px 16px;
+            border-radius: 999px;
             font-size: 13px;
             cursor: pointer;
         }
-
         .btn-outline {
             background: #fff;
-            border: 1px solid #d1d5db;
-            color: #333;
-            padding: 8px 10px;
-            border-radius: 4px;
-            font-size: 12px;
+            border: 1px solid var(--gray-300);
+            color: var(--gray-700);
+            padding: 9px 12px;
+            border-radius: 999px;
+            font-size: 13px;
             cursor: pointer;
-            margin-left: 6px;
         }
-
-        /* ★ Sync 버튼 전용 스타일 */
         .btn-sync {
             background: #444;
-            border: 1px solid #444;
+            border: none;
             color: #fff;
-            padding: 8px 12px;
-            border-radius: 4px;
-            font-size: 12px;
+            padding: 9px 14px;
+            border-radius: 999px;
+            font-size: 13px;
             cursor: pointer;
             margin-left: auto;
         }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-outline:hover { background: #f3f4f6; }
+        .btn-sync:hover { background: #222; }
 
+        /* ---------------------- 요약/정렬 ---------------------- */
         .summary-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
             font-size: 13px;
-            color: #555;
-            margin-bottom: 8px;
+            color: var(--gray-500);
+            margin-bottom: 10px;
         }
-
         .sort-area select {
-            border: 1px solid #d1d5db;
-            border-radius: 4px;
-            padding: 4px 8px;
-            font-size: 12px;
-        }
-
-        .list-wrapper {
+            border-radius: 999px;
+            border: 1px solid var(--gray-300);
+            padding: 5px 14px;
+            font-size: 13px;
             background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
         }
 
-        .item-row {
-            padding: 14px 18px;
-            border-bottom: 1px solid #f1f3f5;
+        /* ---------------------- 리스트 (카드형 2열) ---------------------- */
+        .list-wrapper {
+            background: transparent; /* 카드만 그림자 */
+        }
+
+        .empty-msg {
+            padding: 40px 0;
+            text-align: center;
+            color: #777;
+            font-size: 14px;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .item-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 16px 18px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
             display: flex;
-            gap: 12px;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.15s ease-out, box-shadow 0.15s ease-out;
         }
-
-        .item-row:last-child {
-            border-bottom: none;
-        }
-
-        .thumb {
-            width: 120px;
-            height: 80px;
-            background: #e5e7eb;
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 11px;
-            color: #666;
+        .item-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.08);
         }
 
         .item-main {
@@ -158,28 +186,29 @@
         .title-line {
             font-size: 15px;
             font-weight: bold;
-            margin-bottom: 4px;
+            margin-bottom: 6px;
+            color: var(--gray-700);
         }
 
-        .title-line .badge {
+        .badge {
             display: inline-block;
             font-size: 11px;
             background: #EEF3FF;
-            color: #2F5FD0;
+            color: var(--primary);
             padding: 2px 6px;
-            border-radius: 3px;
+            border-radius: 999px;
             margin-right: 4px;
         }
 
         .sub-line {
             font-size: 12px;
-            color: #666;
+            color: var(--gray-500);
             margin-bottom: 4px;
         }
 
         .addr-line {
             font-size: 12px;
-            color: #444;
+            color: var(--gray-700);
             margin-bottom: 4px;
         }
 
@@ -187,6 +216,7 @@
             font-size: 13px;
             font-weight: bold;
             color: #111;
+            margin-top: 6px;
         }
 
         .price-line span.sub {
@@ -196,21 +226,159 @@
             font-weight: normal;
         }
 
-        .empty-msg {
-            padding: 40px 0;
+        .card-footer {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 10px;
+            gap: 6px;
+        }
+
+		.card-footer button {
+		    padding: 8px 14px;
+		    border-radius: 6px;
+		    font-size: 13px;
+		    cursor: pointer;
+		    font-weight: 600;
+		    border: 1px solid #c8ccd3;
+		    transition: 0.15s;
+		}
+		.btn-map {
+		    background: #f7f7f8;
+		    border-color: #d0d3d8;
+		    color: #333;
+		}        		
+		.btn-cart {
+		    background: #2F5FD0;
+		    border-color: #254cad;
+		    color: #fff;
+		}
+		.btn-buy {
+		    background: #28a745;
+		    border-color: #1e8135;
+		    color: #fff;
+		}
+
+		.btn-map:hover {
+		    background: #e9eaed;
+		}
+		.btn-cart:hover {
+		    background: #254cad;
+		}
+		.btn-buy:hover {
+		    background: #1e8135;
+		}
+
+        /* ---------------------- 페이지네이션 ---------------------- */
+        .pagination {
             text-align: center;
-            color: #777;
-            font-size: 14px;
+            padding: 18px 0;
+        }
+        .pagination button {
+            margin: 0 4px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            border: 1px solid var(--gray-300);
+            font-size: 12px;
+            cursor: pointer;
+            background: #fff;
+            color: #333;
+        }
+        .pagination button.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: #fff;
+        }
+        .pagination button:hover:not(.active) {
+            background: #f3f4f6;
+        }
+
+        /* ---------------------- 입찰 모달 ---------------------- */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.45);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .modal-box {
+            background: #fff;
+            width: 380px;
+            padding: 22px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-title {
+            font-size: 17px;
+            font-weight: bold;
+            margin-bottom: 14px;
+        }
+
+        .modal-row {
+            margin-bottom: 12px;
+        }
+
+        .modal-row label {
+            font-size: 13px;
+            color: #444;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .modal-row input {
+            width: 100%;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            padding: 7px 8px;
+            font-size: 13px;
+        }
+
+        .modal-actions {
+            text-align: right;
+            margin-top: 18px;
+        }
+
+        .modal-actions button {
+            padding: 7px 13px;
+            border-radius: 999px;
+            border: none;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .btn-cancel {
+            background: #ddd;
+            margin-right: 6px;
+        }
+
+        .btn-submit {
+            background: var(--primary);
+            color: #fff;
         }
     </style>
 </head>
 <body>
 
-<header>
-    <div class="logo">온비드 공매 – 부동산 검색</div>
-    <div class="nav-right">
-        <a href="/">홈</a>
-        <a href="/swagger-ui.html">API 문서</a>
+<!-- 공통 헤더 -->
+<header class="top-header">
+    <div class="header-inner">
+        <div class="header-title">온비드 공매 – 부동산 검색</div>
+        <nav class="header-right">
+            <a href="/">시작 화면</a>
+            <a href="/cart">관심목록</a>
+            <a href="/bid/list">입찰 기록</a>
+            <a href="/swagger-ui.html">API 문서</a>
+        </nav>
     </div>
 </header>
 
@@ -222,16 +390,6 @@
             <label>지역</label>
             <input type="text" id="keyword" class="keyword-input" placeholder="예) 서울, 강남, 경기도 성남시">
 
-            <label>대분류</label>
-            <select id="cate1">
-                <option value="">전체</option>
-                <option value="토지">토지</option>
-                <option value="주거용">주거용</option>
-                <option value="상업용">상업용</option>
-                <option value="공장/창고">공장/창고</option>
-                <option value="기타">기타</option>
-            </select>
-
             <label>감정가</label>
             <input type="number" id="minPrice" placeholder="최소">
             <span>~</span>
@@ -239,13 +397,11 @@
 
             <button class="btn-primary" onclick="search()">검색</button>
             <button class="btn-outline" onclick="resetSearch()">초기화</button>
-
-            <!-- ★★★★★ 여기 추가됨: SYNC 버튼 ★★★★★ -->
-            <button class="btn-sync" onclick="syncData()">동기화</button>
+            <button class="btn-sync" onclick="syncData()">API→DB</button>
         </div>
     </div>
 
-    <!-- 결과 요약 -->
+    <!-- 요약 / 정렬 -->
     <div class="summary-bar">
         <div class="result-count">
             총 <strong id="resultCount">0</strong>건 검색됨
@@ -259,84 +415,53 @@
         </div>
     </div>
 
-    <!-- 결과 리스트 -->
+    <!-- 리스트 영역 -->
     <div class="list-wrapper" id="resultWrapper">
         <div class="empty-msg">검색 조건을 입력하거나 “검색” 버튼을 눌러주세요.</div>
     </div>
 </div>
 
 <script>
-
     /* ========================
-         ★ SYNC FUNCTION ★
-       ======================== */
-    function syncData() {
-        if (!confirm("실시간 공매 데이터를 API에서 불러와 DB를 최신화합니다.\n시간이 다소 소요될 수 있습니다.\n진행할까요?")) {
-            return;
-        }
-
-        const btn = document.querySelector(".btn-sync");
-        btn.disabled = true;
-        btn.textContent = "동기화 중...";
-
-        fetch("/onbid/api/sync", { method: "POST" })
-            .then(r => r.text())
-            .then(msg => {
-                alert("동기화 완료!");
-                location.reload();
-            })
-            .catch(e => alert("오류 발생: " + e))
-            .finally(() => {
-                btn.disabled = false;
-                btn.textContent = "동기화";
-            });
-    }
-
-    /* 이하 기존 검색 JS ------------------------------------ */
-
+           검색 기능
+    ======================== */
     let currentData = [];
+    let pageSize = 100;
+    let currentPage = 1;
+    let selectedItemId = null;
 
     function numberFormat(num) {
         if (num === null || num === undefined) return "-";
-        return num.toLocaleString();
+        return Number(num).toLocaleString();
     }
 
     function fetchData(params = "") {
         return fetch("/onbid/api/search" + params)
-            .then(r => {
-                if (!r.ok) throw new Error("HTTP " + r.status);
-                return r.json();
-            });
+            .then(r => r.json());
     }
 
     function search() {
         const keyword = document.getElementById("keyword").value.trim();
-        const cate1 = document.getElementById("cate1").value;
         const minPrice = document.getElementById("minPrice").value;
         const maxPrice = document.getElementById("maxPrice").value;
 
         const q = [];
         if (keyword) q.push("keyword=" + encodeURIComponent(keyword));
-        if (cate1) q.push("cate1=" + encodeURIComponent(cate1));
-        if (minPrice) q.push("minPrice=" + encodeURIComponent(minPrice));
-        if (maxPrice) q.push("maxPrice=" + encodeURIComponent(maxPrice));
+        if (minPrice) q.push("minPrice=" + minPrice);
+        if (maxPrice) q.push("maxPrice=" + maxPrice);
 
-        const paramStr = q.length > 0 ? "?" + q.join("&") : "";
+        const paramStr = q.length ? "?" + q.join("&") : "";
 
         fetchData(paramStr)
             .then(list => {
                 currentData = list || [];
+                currentPage = 1;
                 applySortAndRender();
-            })
-            .catch(e => {
-                console.error(e);
-                alert("조회 중 에러가 발생했습니다.");
             });
     }
 
     function resetSearch() {
         document.getElementById("keyword").value = "";
-        document.getElementById("cate1").value = "";
         document.getElementById("minPrice").value = "";
         document.getElementById("maxPrice").value = "";
         document.getElementById("sortSelect").value = "recent";
@@ -356,8 +481,24 @@
         } else if (sort === "priceDesc") {
             data.sort((a, b) => (b.goodsPrice || 0) - (a.goodsPrice || 0));
         }
+        // 최신순은 기본 정렬(쿼리에서 정렬했다고 가정)
 
-        renderList(data);
+        currentData = data;
+        renderPage(currentPage);
+    }
+
+    /* ========================
+           페이지 렌더링
+    ======================== */
+    function renderPage(page) {
+        currentPage = page;
+
+        const start = (page - 1) * pageSize;
+        const end = start + pageSize;
+
+        const pageItems = currentData.slice(start, end);
+        renderList(pageItems);
+        renderPagination();
     }
 
     function renderList(list) {
@@ -371,19 +512,21 @@
             return;
         }
 
-        countEl.textContent = list.length.toString();
+        countEl.textContent = currentData.length.toString();
+
+        const grid = document.createElement("div");
+        grid.className = "card-grid";
 
         list.forEach(item => {
-            const div = document.createElement("div");
-            div.className = "item-row";
+            const card = document.createElement("div");
+            card.className = "item-card";
 
             const title = item.cltrNm || "(이름 없음)";
             const addr = (item.sido || "") + " " + (item.dtlAddr || "");
             const cate = (item.ctgrHirkNm || "기타") + (item.ctgrHirkNmMid ? " · " + item.ctgrHirkNmMid : "");
             const dpsl = item.dpslMtdNm || "";
 
-            div.innerHTML = `
-                <div class="thumb">이미지</div>
+            card.innerHTML = `
                 <div class="item-main">
                     <div class="title-line">
                         <span class="badge">${dpsl || "공매"}</span>
@@ -396,15 +539,135 @@
                         <span class="sub">관리번호: ${item.cltrMnmtNo || "-"}</span>
                     </div>
                 </div>
+                <div class="card-footer">
+                    <button class="btn-map" onclick="openMap('${addr}')">지도보기</button>
+                    <button class="btn-cart" onclick="addCart(${item.id})">관심 등록</button>
+                    <button class="btn-buy" onclick="openBidForm(${item.id})">입찰하기</button>
+                </div>
             `;
 
-            wrapper.appendChild(div);
+            grid.appendChild(card);
         });
+
+        wrapper.appendChild(grid);
+    }
+
+    function renderPagination() {
+        const wrapper = document.getElementById("resultWrapper");
+        const totalPages = Math.ceil(currentData.length / pageSize);
+        if (totalPages <= 1) return;
+
+        const nav = document.createElement("div");
+        nav.className = "pagination";
+
+        for (let i = 1; i <= totalPages; i++) {
+            const btn = document.createElement("button");
+            btn.textContent = i;
+            if (i === currentPage) btn.classList.add("active");
+            btn.onclick = () => renderPage(i);
+            nav.appendChild(btn);
+        }
+
+        wrapper.appendChild(nav);
+    }
+
+    /* ========================
+         전역 함수
+    ======================== */
+
+    function openMap(addr) {
+        if (!addr || addr.trim() === "") {
+            alert("주소가 없습니다.");
+            return;
+        }
+        const url = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(addr);
+        window.open(url, "_blank");
+    }
+
+    function addCart(id) {
+        fetch("/cart/add/" + id, { method: "POST" })
+            .then(r => r.text())
+            .then(msg => alert("관심 목록에 추가되었습니다!"))
+            .catch(e => alert("오류 발생: " + e));
+    }
+
+    function buyItem(id) {
+        if (!confirm("정말 구매하시겠습니까?")) return;
+
+        fetch("/order/buy/" + id, { method: "POST" })
+            .then(r => r.text())
+            .then(msg => alert("구매 완료!"))
+            .catch(e => alert("오류 발생: " + e));
+    }
+
+    function openBidForm(itemId) {
+        selectedItemId = itemId;
+        document.getElementById("bidModal").style.display = "flex";
+    }
+
+    function closeBidModal() {
+        document.getElementById("bidModal").style.display = "none";
+    }
+
+    function submitBid() {
+        const price = document.getElementById("modalBidPrice").value.trim();
+        const name  = document.getElementById("modalBidName").value.trim();
+        const phone = document.getElementById("modalBidPhone").value.trim();
+
+        if (!price || !name || !phone) {
+            alert("모든 값을 입력해주세요.");
+            return;
+        }
+
+        const body = {
+            itemId: selectedItemId,
+            bidPrice: price,
+            username: name,
+            phone: phone
+        };
+
+        fetch("/bid/submit", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(body)
+        })
+        .then(r => r.text())
+        .then(msg => {
+            alert("입찰 완료!");
+            closeBidModal();
+        })
+        .catch(e => alert("오류: " + e));
     }
 
     window.addEventListener("load", () => search());
-
 </script>
+
+<!-- 입찰 모달 -->
+<div id="bidModal" class="modal-overlay">
+    <div class="modal-box">
+        <div class="modal-title">입찰하기</div>
+
+        <div class="modal-row">
+            <label>입찰 금액</label>
+            <input type="number" id="modalBidPrice" placeholder="예: 25000000">
+        </div>
+
+        <div class="modal-row">
+            <label>입찰자 이름</label>
+            <input type="text" id="modalBidName" placeholder="예: 홍길동">
+        </div>
+
+        <div class="modal-row">
+            <label>연락처</label>
+            <input type="text" id="modalBidPhone" placeholder="예: 010-1234-5678">
+        </div>
+
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeBidModal()">취소</button>
+            <button class="btn-submit" onclick="submitBid()">입찰하기</button>
+        </div>
+    </div>
+</div>
 
 </body>
 </html>
