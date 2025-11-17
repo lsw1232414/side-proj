@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>상세 정보</title>
+
+<style>
+:root {
+    --primary: #2F5FD0;
+    --primary-dark: #254cad;
+    --gray-100: #f5f6f8;
+    --gray-200: #e6e8eb;
+    --gray-300: #d1d5db;
+    --gray-500: #6b7280;
+    --gray-700: #374151;
+}
+
+body {
+    background: var(--gray-100);
+    font-family: -apple-system, "맑은 고딕", sans-serif;
+    margin: 0;
+}
+
+/* 공통 헤더 */
+.top-header {
+    background: var(--primary);
+    color: #fff;
+    padding: 14px 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.12);
+    margin-bottom: 24px;
+}
+.header-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.header-title {
+    font-size: 20px;
+    font-weight: 700;
+}
+.header-right a {
+    color: #fff;
+    margin-left: 16px;
+    text-decoration: none;
+    font-size: 14px;
+    opacity: 0.9;
+    transition: 0.2s;
+}
+.header-right a:hover {
+    opacity: 1;
+    text-decoration: underline;
+}
+
+/* 레이아웃 */
+.container {
+    max-width: 900px;
+    margin: 0 auto 40px;
+    padding: 16px;
+}
+
+/* 버튼 모음 */
+.action-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.action-buttons button {
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    border: 1px solid #c8ccd3;
+    font-weight: 600;
+}
+
+.btn-map { background: #f7f7f8; color: #333; }
+.btn-map:hover { background: #e9eaed; }
+
+.btn-cart { background: #2F5FD0; color: #fff; border-color: #254cad; }
+.btn-cart:hover { background: #254cad; }
+
+.btn-bid { background: #28a745; color: #fff; border-color: #1e8135; }
+.btn-bid:hover { background: #1e8135; }
+
+/* 제목 */
+h1 {
+    font-size: 22px;
+    margin-top: 0;
+    color: var(--gray-700);
+}
+
+/* 섹션 제목 */
+.section-title {
+    font-size: 18px;
+    margin: 24px 0 12px;
+    font-weight: bold;
+    border-left: 4px solid var(--primary);
+    padding-left: 10px;
+    color: var(--gray-700);
+}
+
+/* 테이블 */
+.table-box {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.table-box th,
+.table-box td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--gray-300);
+    font-size: 14px;
+}
+.table-box th {
+    width: 180px;
+    background: #fafafa;
+    color: #333;
+    font-weight: 600;
+}
+
+/* 뒤로가기 버튼 */
+.btn-back {
+    margin-top: 24px;
+    padding: 10px 18px;
+    background: var(--primary);
+    color: #fff;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+}
+.btn-back:hover {
+    background: var(--primary-dark);
+}
+</style>
+
+<script>
+function openMap(addr) {
+    if (!addr || addr.trim() === "") {
+        alert("주소가 없습니다.");
+        return;
+    }
+    const url = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(addr);
+    window.open(url, "_blank");
+}
+
+function addCart(id) {
+    fetch("/cart/add/" + id, { method: "POST" })
+        .then(r => r.text())
+        .then(_ => alert("관심목록에 추가되었습니다."))
+        .catch(e => alert("오류: " + e));
+}
+
+function openBidForm(id) {
+    alert("입찰 기능 추후 구현");
+}
+</script>
+
+</head>
+<body>
+
+<!-- 헤더 -->
+<header class="top-header">
+    <div class="header-inner">
+        <div class="header-title">온비드 공매 – 상세 정보</div>
+        <nav class="header-right">
+            <a href="/">시작 화면</a>
+            <a href="/cart">관심목록</a>
+            <a href="/bid/list">입찰 기록</a>
+            <a href="/swagger-ui.html">API 문서</a>
+        </nav>
+    </div>
+</header>
+
+<div class="container">
+
+    <!-- 액션 버튼 -->
+    <div class="action-buttons">
+        <button class="btn-map"
+                th:attr="data-addr=${item.sido + ' ' + item.dtlAddr}"
+                onclick="openMap(this.dataset.addr)">지도보기</button>
+
+        <button class="btn-cart"
+                th:attr="data-id=${item.id}"
+                onclick="addCart(this.dataset.id)">관심등록</button>
+
+        <button class="btn-bid"
+                th:attr="data-id=${item.id}"
+                onclick="openBidForm(this.dataset.id)">입찰하기</button>
+    </div>
+
+
+    <!-- 제목 -->
+    <h1 th:text="${item.cltrNm}"></h1>
+
+    <!-- 기본 정보 -->
+    <div class="section-title">기본 정보</div>
+    <table class="table-box">
+        <tr><th>주소</th><td th:text="${item.sido + ' ' + item.dtlAddr}"></td></tr>
+        <tr><th>감정가</th><td th:text="${#numbers.formatInteger(item.goodsPrice, 3, 'COMMA')} + '원'"></td></tr>
+        <tr><th>관리 번호</th><td th:text="${item.cltrMnmtNo}"></td></tr>
+        <tr><th>물건 번호</th><td th:text="${item.cltrNo}"></td></tr>
+        <tr><th>용도</th><td th:text="${item.ctgrHirkNm + ' - ' + item.ctgrHirkNmMid}"></td></tr>
+        <tr><th>처분 방식</th><td th:text="${item.dpslMtdNm}"></td></tr>
+    </table>
+
+    <!-- 입찰 정보 -->
+    <div class="section-title">입찰 정보</div>
+    <table class="table-box">
+        <tr><th>입찰 시작</th><td th:text="${history != null ? history.pbctBegnDtm : '-'}"></td></tr>
+        <tr><th>입찰 마감</th><td th:text="${history != null ? history.pbctClsDtm : '-'}"></td></tr>
+        <tr><th>최저 입찰가</th><td th:text="${history != null ? history.openPrice : '-'}"></td></tr>
+        <tr><th>물건 상태</th><td th:text="${history != null ? history.cltrSttsNm : '-'}"></td></tr>
+        <tr><th>유찰 횟수</th><td th:text="${history != null ? history.uscbCnt : '-'}"></td></tr>
+        <tr><th>조회수</th><td th:text="${history != null ? history.iqryCnt : '-'}"></td></tr>
+    </table>
+
+    <button class="btn-back" onclick="history.back()">← 뒤로가기</button>
+</div>
+
+</body>
+</html>

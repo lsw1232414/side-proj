@@ -19,5 +19,13 @@
         WHERE cltr_no = #{cltrNo}
         ORDER BY id DESC
     </select>
+    <select id="findLatestByCltrNo" resultType="com.lsw.onbid.model.History">
+    SELECT *
+    FROM history
+    WHERE cltr_no = #{cltrNo}
+    ORDER BY id DESC
+    LIMIT 1
+	</select>
+
 
 </mapper>

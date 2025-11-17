@@ -29,6 +29,6 @@ public interface ItemMapper {
     // 수정
     void update(Item item);
     
-
+    Item findById(Long id);
 
 }

@@ -40,6 +40,12 @@
         <!-- 🔥 여기 중요: item_id → id -->
         ORDER BY id DESC
     </select>
+    <select id="findById" resultType="com.lsw.onbid.model.Item">
+    SELECT *
+    FROM item
+    WHERE id = #{id}
+	</select>
+
 
     <!-- 신규 저장 -->
     <insert id="insert" parameterType="com.lsw.onbid.model.Item">

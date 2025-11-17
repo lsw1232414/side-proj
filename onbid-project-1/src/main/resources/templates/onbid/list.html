@@ -334,6 +334,14 @@
             display: block;
             margin-bottom: 4px;
         }
+		.btn-detail {
+		    background: #6c5ce7;
+		    color: #fff;
+		    border: 1px solid #6c5ce7;
+		}
+		.btn-detail:hover {
+		    opacity: 0.9;
+		}
 
         .modal-row input {
             width: 100%;
@@ -540,9 +548,11 @@
                     </div>
                 </div>
                 <div class="card-footer">
-                    <button class="btn-map" onclick="openMap('${addr}')">지도보기</button>
-                    <button class="btn-cart" onclick="addCart(${item.id})">관심 등록</button>
-                    <button class="btn-buy" onclick="openBidForm(${item.id})">입찰하기</button>
+					<div class="card-footer">
+					    <button class="btn-map" onclick="openMap('${addr}')">지도보기</button>
+					    <button class="btn-detail" onclick="goDetail(${item.id})">상세보기</button>
+					    <button class="btn-cart" onclick="addCart(${item.id})">관심 등록</button>
+					    <button class="btn-buy" onclick="openBidForm(${item.id})">입찰하기</button>
                 </div>
             `;
 
@@ -608,6 +618,9 @@
     function closeBidModal() {
         document.getElementById("bidModal").style.display = "none";
     }
+	function goDetail(id) {
+	    window.location.href = "/onbid/detail/" + id;
+	}
 
     function submitBid() {
         const price = document.getElementById("modalBidPrice").value.trim();
