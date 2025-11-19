@@ -19,4 +19,5 @@ public interface BidMapper {
 
     // ✅ 전체 삭제
     void clearAll();
+    void truncate();
 }

@@ -2,6 +2,7 @@ package com.lsw.onbid.dto;
 
 import lombok.Data;
 
+
 @Data
 public class BidRequest {
     private Long itemId;

@@ -9,12 +9,15 @@
         VALUES (#{itemId})
     </insert>
 
+    <!-- ★ item_id를 반드시 조회해서 CartItem.itemId 필드로 매핑해야 한다! -->
     <select id="findAll" resultType="com.lsw.onbid.model.CartItem">
-        SELECT c.id AS id,
-               i.cltr_nm AS cltrNm,
-               i.goods_price AS goodsPrice,
-               i.sido AS sido,
-               i.dtl_addr AS dtlAddr
+        SELECT 
+            c.id AS id,                -- cart PK
+            c.item_id AS itemId,       -- ★★ 추가됨 (이게 핵심)
+            i.cltr_nm AS cltrNm,
+            i.goods_price AS goodsPrice,
+            i.sido AS sido,
+            i.dtl_addr AS dtlAddr
         FROM cart c
         JOIN item i ON c.item_id = i.id
         ORDER BY c.id DESC

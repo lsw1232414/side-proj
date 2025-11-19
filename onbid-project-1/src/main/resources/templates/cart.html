@@ -114,6 +114,17 @@
             opacity: 0.9;
         }
 
+        .btn-detail {
+            background: #6c5ce7;
+            color: #fff;
+            border: none;
+            padding: 7px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .btn-detail:hover { opacity: 0.9; }
+
         /* ===== 모달 ===== */
         .modal-overlay {
             position: fixed;
@@ -184,7 +195,7 @@
     <div class="header-inner">
         <div class="header-title">관심목록</div>
         <nav class="header-right">
-            <a href="/onbid/list">홈</a>
+            <a href="/">홈</a>
             <a href="/cart">관심목록</a>
             <a href="/bid/list">입찰 기록</a>
         </nav>
@@ -204,6 +215,7 @@
                     <th>물건명</th>
                     <th>주소</th>
                     <th>감정가</th>
+                    <th style="min-width:80px;">상세보기</th>
                 </tr>
             </thead>
 
@@ -213,6 +225,14 @@
                     <td th:text="${c.cltrNm}"></td>
                     <td th:text="${c.sido + ' ' + c.dtlAddr}"></td>
                     <td th:text="${#numbers.formatInteger(c.goodsPrice, 3, 'COMMA')} + '원'"></td>
+
+                    <!-- 상세보기 버튼 -->
+                    <td>
+						<button class="btn-detail"
+						        th:onclick="'goDetail(' + ${c.itemId} + ')'">
+						    상세보기
+						</button>
+                    </td>
                 </tr>
             </tbody>
         </table>
@@ -262,6 +282,13 @@ function clearCart() {
 
     fetch("/cart/clear", { method:"POST" })
         .then(() => location.reload());
+}
+
+/* -----------------------------
+   상세보기 이동 (이벤트 버블링 방지!)
+----------------------------- */
+function goDetail(id) {
+    window.location.href = "/onbid/detail/" + id;
 }
 
 /* -----------------------------

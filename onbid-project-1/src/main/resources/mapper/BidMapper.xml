@@ -34,8 +34,9 @@
     </delete>
 
     <!-- ✅ 전체 삭제 -->
-    <delete id="clearAll">
-        DELETE FROM bid
-    </delete>
+    <update id="truncate">
+    TRUNCATE TABLE bid;
+	</update>
+
 
 </mapper>

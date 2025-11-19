@@ -6,6 +6,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
+import com.lsw.onbid.mapper.BidMapper;
 import com.lsw.onbid.mapper.HistoryMapper;
 import com.lsw.onbid.mapper.ItemMapper;
 import com.lsw.onbid.model.History;
@@ -23,13 +24,17 @@ public class OnbidService {
     private final ExternalApiClient api;
     private final ItemMapper itemMapper;
     private final HistoryMapper historyMapper;
+    private final BidMapper bidMapper;
+
 
     public void syncFromApi() {
 
         log.info("📌 전체 초기화 시작: item + history 테이블 비움");
-
-        itemMapper.truncate();
-        historyMapper.truncate();
+        
+        bidMapper.truncate();      // 1) 입찰 먼저 삭제 이유 동기화 버튼누르면 데이터가 새로 insert되면 item_id가 재배정 되기때문에 데이터 일관성 붕괴
+        historyMapper.truncate();  // 2) 히스토리 삭제
+        itemMapper.truncate();     // 3) 아이템 삭제
+        
 
         int saved = 0;
 

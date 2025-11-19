@@ -55,6 +55,7 @@ public class ExternalApiClient {
     }
 
     /** Page 조회 */
+    /** Page 조회 */
     public JSONArray fetchItems(int page, int size) {
         try {
             String url = BASE_LIST_URL
@@ -72,11 +73,20 @@ public class ExternalApiClient {
             Object items = body.get("items");
             if (items instanceof JSONObject obj) {
 
-                if (obj.get("item") instanceof JSONArray arr)
+                Object itemObj = obj.get("item");
+
+                // 🔥 여기! item JSON 찍기 (딱 첫 번째 item만)
+                if (itemObj instanceof JSONObject firstItem) {
+                    log.warn("🔍 FIRST ITEM JSON = {}", firstItem.toString());
+                } else if (itemObj instanceof JSONArray arr && arr.length() > 0) {
+                    log.warn("🔍 FIRST ITEM JSON = {}", arr.getJSONObject(0).toString());
+                }
+
+                if (itemObj instanceof JSONArray arr)
                     return arr;
 
                 JSONArray arr = new JSONArray();
-                arr.put(obj.get("item"));
+                arr.put(itemObj);
                 return arr;
             }
 
@@ -87,6 +97,7 @@ public class ExternalApiClient {
             return new JSONArray();
         }
     }
+
 
     /** 🟨 물건 상세 조회 (history용 데이터) */
     public JSONObject fetchDetail(String cltrNo) {
@@ -114,7 +125,7 @@ public class ExternalApiClient {
     /** HTTP → XML → JSON 변환 */
     private JSONObject call(String url) throws Exception {
         String xml = request(url);
-        JSONObject json = XML.toJSONObject(xml);
+        JSONObject json = XML.toJSONObject(xml); // ****************************이부분
 
         if (!json.has("response")
                 || !json.getJSONObject("response").has("body")) {
@@ -146,4 +157,5 @@ public class ExternalApiClient {
         conn.disconnect();
         return sb.toString();
     }
+    
 }
